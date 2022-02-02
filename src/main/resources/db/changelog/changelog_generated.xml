@@ -1,0 +1,354 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="genie (generated)" id="1643716917538-1">
+        <createTable tableName="tb_code">
+            <column name="code_type" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="code_PK"/>
+            </column>
+            <column name="code" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="code_PK"/>
+            </column>
+            <column name="value" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643716917538-2">
+        <createTable tableName="tb_customer">
+            <column name="id" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="customer_pk"/>
+            </column>
+            <column name="name" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="birthday" type="VARCHAR"/>
+            <column name="gender" type="VARCHAR"/>
+            <column name="address" type="VARCHAR"/>
+            <column name="phone_number" type="VARCHAR"/>
+            <column name="type" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643716917538-3">
+        <createTable tableName="tb_dept">
+            <column name="id" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="tb_dept_PK"/>
+            </column>
+            <column name="name" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643716917538-4">
+        <createTable tableName="tb_service_request">
+            <column name="id" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="service_request_pk"/>
+            </column>
+            <column name="title" type="VARCHAR"/>
+            <column name="customer_id" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR"/>
+            <column name="detail" type="VARCHAR"/>
+            <column name="status" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="call_agent_id" type="VARCHAR"/>
+            <column name="voc_assgnee_id" type="VARCHAR"/>
+            <column name="voc_assgnee_dept_id" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643716917538-5">
+        <createTable tableName="tb_user">
+            <column name="id" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="tb_user_PK"/>
+            </column>
+            <column name="name" type="VARCHAR"/>
+            <column name="phone_number" type="VARCHAR"/>
+            <column name="email" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="department_id" type="VARCHAR"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643716917538-6">
+        <createIndex indexName="code_index_updated" tableName="tb_code">
+            <column name="updated"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643716917538-7">
+        <createIndex indexName="customer_index_name" tableName="tb_customer">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643716917538-8">
+        <createIndex indexName="departments_index_updated" tableName="tb_dept">
+            <column name="updated"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643716917538-9">
+        <createIndex indexName="service_request_index_bycustomer" tableName="tb_service_request">
+            <column name="customer_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643716917538-10">
+        <createIndex indexName="service_request_index_updated" tableName="tb_service_request">
+            <column name="updated"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643717152373-1">
+        <createTable tableName="tb_code">
+            <column name="code_type" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="code_PK"/>
+            </column>
+            <column name="code" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="code_PK"/>
+            </column>
+            <column name="value" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643717152373-2">
+        <createTable tableName="tb_customer">
+            <column name="id" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="customer_pk"/>
+            </column>
+            <column name="name" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="birthday" type="VARCHAR"/>
+            <column name="gender" type="VARCHAR"/>
+            <column name="address" type="VARCHAR"/>
+            <column name="phone_number" type="VARCHAR"/>
+            <column name="type" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643717152373-3">
+        <createTable tableName="tb_dept">
+            <column name="id" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="tb_dept_PK"/>
+            </column>
+            <column name="name" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643717152373-4">
+        <createTable tableName="tb_service_request">
+            <column name="id" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="service_request_pk"/>
+            </column>
+            <column name="title" type="VARCHAR"/>
+            <column name="customer_id" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR"/>
+            <column name="detail" type="VARCHAR"/>
+            <column name="status" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="call_agent_id" type="VARCHAR"/>
+            <column name="voc_assgnee_id" type="VARCHAR"/>
+            <column name="voc_assgnee_dept_id" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643717152373-5">
+        <createTable tableName="tb_user">
+            <column name="id" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="tb_user_PK"/>
+            </column>
+            <column name="name" type="VARCHAR"/>
+            <column name="phone_number" type="VARCHAR"/>
+            <column name="email" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="department_id" type="VARCHAR"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643717152373-6">
+        <createIndex indexName="code_index_updated" tableName="tb_code">
+            <column name="updated"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643717152373-7">
+        <createIndex indexName="customer_index_name" tableName="tb_customer">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643717152373-8">
+        <createIndex indexName="departments_index_updated" tableName="tb_dept">
+            <column name="updated"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643717152373-9">
+        <createIndex indexName="service_request_index_bycustomer" tableName="tb_service_request">
+            <column name="customer_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643717152373-10">
+        <createIndex indexName="service_request_index_updated" tableName="tb_service_request">
+            <column name="updated"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643717152373-11">
+        <createTable tableName="tb_course">
+            <column name="id" type="VARCHAR"/>
+            <column name="title" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMPTZ[](35, 6)"/>
+            <column name="updated" type="TIMESTAMPTZ[](35, 6)"/>
+            <column name="description" type="VARCHAR"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643733533549-1">
+        <createTable tableName="tb_code">
+            <column name="code_type" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="code_PK"/>
+            </column>
+            <column name="code" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="code_PK"/>
+            </column>
+            <column name="value" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643733533549-2">
+        <createTable tableName="tb_course">
+            <column name="id" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="course_pk"/>
+            </column>
+            <column name="title" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="description" type="VARCHAR"/>
+            <column name="version" type="numeric"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643733533549-3">
+        <createTable tableName="tb_customer">
+            <column name="id" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="customer_pk"/>
+            </column>
+            <column name="name" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="birthday" type="VARCHAR"/>
+            <column name="gender" type="VARCHAR"/>
+            <column name="address" type="VARCHAR"/>
+            <column name="phone_number" type="VARCHAR"/>
+            <column name="type" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643733533549-4">
+        <createTable tableName="tb_dept">
+            <column name="id" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="tb_dept_PK"/>
+            </column>
+            <column name="name" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643733533549-5">
+        <createTable tableName="tb_service_request">
+            <column name="id" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="service_request_pk"/>
+            </column>
+            <column name="title" type="VARCHAR"/>
+            <column name="customer_id" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR"/>
+            <column name="detail" type="VARCHAR"/>
+            <column name="status" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="call_agent_id" type="VARCHAR"/>
+            <column name="voc_assgnee_id" type="VARCHAR"/>
+            <column name="voc_assgnee_dept_id" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643733533549-6">
+        <createTable tableName="tb_user">
+            <column name="id" type="VARCHAR">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="tb_user_PK"/>
+            </column>
+            <column name="name" type="VARCHAR"/>
+            <column name="phone_number" type="VARCHAR"/>
+            <column name="email" type="VARCHAR"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="updated" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="department_id" type="VARCHAR"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643733533549-7">
+        <createIndex indexName="code_index_updated" tableName="tb_code">
+            <column name="updated"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643733533549-8">
+        <createIndex indexName="customer_index_name" tableName="tb_customer">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643733533549-9">
+        <createIndex indexName="departments_index_updated" tableName="tb_dept">
+            <column name="updated"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643733533549-10">
+        <createIndex indexName="service_request_index_bycustomer" tableName="tb_service_request">
+            <column name="customer_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="genie (generated)" id="1643733533549-11">
+        <createIndex indexName="service_request_index_updated" tableName="tb_service_request">
+            <column name="updated"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
