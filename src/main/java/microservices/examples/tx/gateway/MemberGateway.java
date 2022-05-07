@@ -12,7 +12,7 @@ public class MemberGateway {
 		return null;
 	}
 
-	public void romoveManager(String id, UserDetails loginUser) {
+	public void removeManager(String id, UserDetails loginUser) {
 	}
 
 }

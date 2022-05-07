@@ -26,129 +26,146 @@ public class CourseService {
 	BoardGateway boardGateway;
 	CourseJPARepository courseRepository;
 
-    @Autowired
-    PlatformTransactionManager transactionManager;
+	@Autowired
+	PlatformTransactionManager transactionManager;
 
-
-	
 	public PlatformTransactionManager getTransactionManager() {
 		return transactionManager;
 	}
 
-	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+	public void setTransactionManager(
+				PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
 
 	@Autowired
-	public CourseService(CourseMyBatisDAO courseMapper, MemberGateway memberGateway, BoardGateway boardGateway, CourseJPARepository courseRepository) {
+	public CourseService(CourseMyBatisDAO courseMapper,
+				MemberGateway memberGateway, BoardGateway boardGateway,
+				CourseJPARepository courseRepository) {
 		this.courseMapper = courseMapper;
 		this.memberGateway = memberGateway;
 		this.boardGateway = boardGateway;
-		this.courseRepository = courseRepository; 
+		this.courseRepository = courseRepository;
 	}
 
 	@Transactional
 	public void createCourse(Course course) {
-		//0. 입력값 Validation
+		log.error("-_-;;1-1");
+		// 0. 입력값 Validation
 		UserDetails loginUser = ExampleSecurityContext.getCurrentLoginUser();
 		ensureUserCanCreateCourse(loginUser);
 		validateNewCourse(course);
 
-		//1. 과정 정보 생
+		// 1. 과정 정보 생성
 		String courseId = course.getId();
+		log.error("-_-;;1-2");
 		courseMapper.create(course);
-		
-		//2. 멤버 서비스에 생성자를 관리자로 등록 w/ courseId
+		log.error("-_-;;1-3");
+
+		// 2. 멤버 서비스에 생성자를 관리자로 등록 w/ courseId
 		memberGateway.addManager(courseId, loginUser);
-		
-		//3. 과정 게시판 서비스에 게시판 생성 w/ courseId
+
+		// 3. 과정 게시판 서비스에 게시판 생성 w/ courseId
 		try {
 			boardGateway.addBoard(courseId, loginUser);
-			
+
 		} catch (Exception originalException) {
 			try {
-				memberGateway.romoveManager(courseId, loginUser);
-			} catch  (Exception compensationExcention) {
-				log.error("COMPENSATION TRANSACTION ERROR! {}", compensationExcention);
+				memberGateway.removeManager(courseId, loginUser);
+			} catch (Exception compensationExcention) {
+				log.error("COMPENSATION TRANSACTION ERROR! {}",
+							compensationExcention);
 			}
 			throw originalException;
 		}
+		log.error("-_-;;1-10");
 	}
 
-    public void createCourseOptimisticLocking_oneTryCatchBlock(Course course) {
-		//0. 입력값 Validation
-		UserDetails loginUser = ExampleSecurityContext.getCurrentLoginUser();
-		ensureUserCanCreateCourse(loginUser);
-		validateNewCourse(course);
-		
-        TransactionDefinition txDefinition = new DefaultTransactionDefinition();
-        TransactionStatus txStatus = transactionManager.getTransaction(txDefinition);
+public void createCourseOptimisticLocking_oneTryCatchBlock(Course course) {
+	// 0. 입력값 Validation
+	UserDetails loginUser = ExampleSecurityContext.getCurrentLoginUser();
+	ensureUserCanCreateCourse(loginUser);
+	validateNewCourse(course);
 
-        Set<String> txLog = new HashSet<>();
-        
-        String courseId = null;
-        try {
-			//1. 과정 정보 생
-        	courseId = course.getId();
-			courseRepository.save(course);
-			txLog.add("courseSaved");
+	TransactionDefinition txDefinition = new DefaultTransactionDefinition();
+	TransactionStatus txStatus = transactionManager
+				.getTransaction(txDefinition);
 
-			//2. 멤버 서비스에 생성자를 관리자로 등록 w/ courseId
-			memberGateway.addManager(courseId, loginUser);
-			txLog.add("managerAdded");
-			
-			//3. 과정 게시판 서비스에 게시판 생성 w/ courseId
-			boardGateway.addBoard(courseId, loginUser);
-			txLog.add("boardAdded");
+	Set<String> txLog = new HashSet<>();
 
-			transactionManager.commit(txStatus);
-
-        } catch (Exception originalException) {
-			if (txLog.contains("boardAdded")) {
-				compensateAddBoard(courseId, loginUser);
-			}
-			if (txLog.contains("managerAdded")) {
-				compensateAddManager(courseId, loginUser);
-			}
-			if (txLog.contains("courseSaved")) {
-				rollbackTransaction(txStatus);
-			}
-			throw new RuntimeException("Failed to create a course", originalException);
-        }
-	}
-
-    public void createCourseOptimisticLocking_shortTransactionSpan(Course course) {
-		//0. 입력값 Validation
-		UserDetails loginUser = ExampleSecurityContext.getCurrentLoginUser();
-		ensureUserCanCreateCourse(loginUser);
-		validateNewCourse(course);
-		
-        TransactionDefinition txDefinition = new DefaultTransactionDefinition();
-        TransactionStatus txStatus = transactionManager.getTransaction(txDefinition);
-
-        Set<String> txLog = new HashSet<>();
-        
-		//1. 과정 정보 생
-        String courseId = null;
-    	courseId = course.getId();
+	String courseId = null;
+	try {
+		// 1. 과정 정보 생성
+		courseId = course.getId();
 		courseRepository.save(course);
+		txLog.add("courseSaved");
+
+		// 2. 멤버 서비스에 생성자를 관리자로 등록 w/ courseId
+		memberGateway.addManager(courseId, loginUser);
+		txLog.add("managerAdded");
+
+		// 3. 과정 게시판 서비스에 게시판 생성 w/ courseId
+		boardGateway.addBoard(courseId, loginUser);
+		txLog.add("boardAdded");
+
+		// 4. 데이터베이스 커밋
+		transactionManager.commit(txStatus);
+
+	} catch (Exception originalException) {
+		if (txLog.contains("boardAdded")) {
+			compensateAddBoard(courseId, loginUser);
+		}
+		if (txLog.contains("managerAdded")) {
+			compensateAddManager(courseId, loginUser);
+		}
+		if (txLog.contains("courseSaved")) {
+			rollbackTransaction(txStatus);
+		}
+		String msg = "Failed to create a course:"+ txLog.toString();
+		throw new RuntimeException(msg,originalException);
+	}
+	log.error("-_-5;;");
+}
+
+	public void createCourseOptimisticLocking_shortTransactionSpan(Course course) {
+		// 0. 입력값 Validation
+		UserDetails loginUser = ExampleSecurityContext.getCurrentLoginUser();
+		ensureUserCanCreateCourse(loginUser);
+		validateNewCourse(course);
+
+		log.error("-_-;;01-1");
+		TransactionDefinition txDefinition = new DefaultTransactionDefinition();
+		log.error("-_-;;01-2");
+		TransactionStatus txStatus = transactionManager
+					.getTransaction(txDefinition);
+		log.error("-_-;;01-3");
+
+		Set<String> txLog = new HashSet<>();
+
+		// 1. 과정 정보 생
+		String courseId = null;
+		courseId = course.getId();
+		log.error("-_-;;01-4");
+		courseRepository.save(course);
+		log.error("-_-;;01-5");
 		try {
 			transactionManager.commit(txStatus);
+			log.error("-_-;;01-1");
 		} catch (Exception exception) {
 			transactionManager.rollback(txStatus);
 			throw new RuntimeException("Failed to create a course", exception);
 		}
 
 		try {
-			//2. 멤버 서비스에 생성자를 관리자로 등록 w/ courseId
+			// 2. 멤버 서비스에 생성자를 관리자로 등록 w/ courseId
 			memberGateway.addManager(courseId, loginUser);
 			txLog.add("managerAdded");
-			
-			//3. 과정 게시판 서비스에 게시판 생성 w/ courseId
+
+			// 3. 과정 게시판 서비스에 게시판 생성 w/ courseId
 			boardGateway.addBoard(courseId, loginUser);
 			txLog.add("boardAdded");
 
-        } catch (Exception originalException) {
+		} catch (Exception originalException) {
 			if (txLog.contains("boardAdded")) {
 				compensateAddBoard(courseId, loginUser);
 			}
@@ -156,90 +173,121 @@ public class CourseService {
 				compensateAddManager(courseId, loginUser);
 			}
 			compensateSaveCourse(courseId, loginUser);
-			throw new RuntimeException("Failed to create a course", originalException);
-        }
+			throw new RuntimeException("Failed to create a course",
+						originalException);
+		}
 	}
-    
-    
+
 	private void rollbackTransaction(TransactionStatus tx) {
 		try {
-		    transactionManager.rollback(tx);
-		}
-		catch(RuntimeException compensationExcention) {
-			log.error("COMPENSATION TRANSACTION ERROR! {}", compensationExcention);
-		}
-	}
-    
-    private void compensateSaveCourse(String courseId, UserDetails loginUser) {
-		try {
-			courseRepository.deleteById(courseId);
-		}
-		catch(RuntimeException compensationExcention) {
+			transactionManager.rollback(tx);
+		} catch (RuntimeException compensationExcention) {
 			log.error("COMPENSATION TRANSACTION ERROR! {}", compensationExcention);
 		}
 	}
 
-    private void compensateAddManager(String courseId, UserDetails loginUser) {
+	private void compensateSaveCourse(String courseId, UserDetails loginUser) {
 		try {
-		    memberGateway.romoveManager(courseId, loginUser);
+			courseRepository.deleteById(courseId);
+		} catch (RuntimeException compensationExcention) {
+			log.error("COMPENSATION TRANSACTION ERROR! {}", compensationExcention);
 		}
-		catch(RuntimeException compensationExcention) {
+	}
+
+	private void compensateAddManager(String courseId, UserDetails loginUser) {
+		try {
+			memberGateway.removeManager(courseId, loginUser);
+		} catch (RuntimeException compensationExcention) {
 			log.error("COMPENSATION TRANSACTION ERROR! {}", compensationExcention);
 		}
 	}
 
 	private void compensateAddBoard(String courseId, UserDetails loginUser) {
 		try {
-		    boardGateway.removeBoard(courseId, loginUser);
-		}
-		catch(RuntimeException compensationExcention) {
+			boardGateway.removeBoard(courseId, loginUser);
+		} catch (RuntimeException compensationExcention) {
 			log.error("COMPENSATION TRANSACTION ERROR! {}", compensationExcention);
 		}
 	}
 
-	//	@Transactional
+	// @Transactional
 	public void createCourseOptimisticLocking_manyTryCatchBlocks(Course course) {
-		//0. 입력값 Validation
+		// 0. 입력값 Validation
 		UserDetails loginUser = ExampleSecurityContext.getCurrentLoginUser();
 		ensureUserCanCreateCourse(loginUser);
 		validateNewCourse(course);
-		
-        TransactionDefinition txDefinition = new DefaultTransactionDefinition();
-        TransactionStatus txStatus = transactionManager.getTransaction(txDefinition);
 
-        //1. 과정 정보 생성
+		TransactionDefinition txDefinition = new DefaultTransactionDefinition();
+		TransactionStatus txStatus = transactionManager
+					.getTransaction(txDefinition);
+
+		// 1. 과정 정보 생성
 		String courseId = course.getId();
 		courseRepository.save(course);
-		
-		//2. 멤버 서비스에 생성자를 관리자로 등록 w/ courseId
+
+		// 2. 멤버 서비스에 생성자를 관리자로 등록 w/ courseId
 		try {
 			memberGateway.addManager(courseId, loginUser);
 		} catch (Exception originalException) {
-			rollbackTransaction(txStatus);
-			throw new RuntimeException("Failed to create a course", originalException);
+			try {
+				transactionManager.rollback(txStatus);
+			} catch (RuntimeException compensationExcention) {
+				log.error("COMPENSATION TRANSACTION ERROR! {}",
+							compensationExcention);
+			}
+			throw new RuntimeException("Failed to create a course",
+						originalException);
 		}
-		
-		//3. 과정 게시판 서비스에 게시판 생성 w/ courseId
+
+		// 3. 과정 게시판 서비스에 게시판 생성 w/ courseId
 		try {
 			boardGateway.addBoard(courseId, loginUser);
-			
+
 		} catch (Exception originalException) {
-			compensateAddManager(courseId, loginUser);
-			rollbackTransaction(txStatus);
-			throw new RuntimeException("Failed to create a course", originalException);
+			try {
+				memberGateway.removeManager(courseId, loginUser);
+			} catch (RuntimeException compensationExcention1) {
+				log.error("COMPENSATION TRANSACTION ERROR! {}",
+							compensationExcention1);
+			}
+			try {
+				transactionManager.rollback(txStatus);
+			} catch (RuntimeException compensationExcention) {
+				log.error("COMPENSATION TRANSACTION ERROR! {}",
+							compensationExcention);
+			}
+			throw new RuntimeException("Failed to create a course",
+						originalException);
 		}
-		
+
+		// 4. 데이터베이스 커밋
 		try {
 			transactionManager.commit(txStatus);
-		} catch  (Exception originalException) {
-			compensateAddBoard(courseId, loginUser);
-			compensateAddManager(courseId, loginUser);
-			rollbackTransaction(txStatus);
-			throw new RuntimeException("Failed to create a course", originalException);
+		} catch (Exception originalException) {
+			try {
+				boardGateway.removeBoard(courseId, loginUser);
+			} catch (RuntimeException compensationExcention) {
+				log.error("COMPENSATION TRANSACTION ERROR! {}",
+							compensationExcention);
+			}
+			try {
+				memberGateway.removeManager(courseId, loginUser);
+			} catch (RuntimeException compensationExcention1) {
+				log.error("COMPENSATION TRANSACTION ERROR! {}",
+							compensationExcention1);
+			}
+			try {
+				transactionManager.rollback(txStatus);
+			} catch (RuntimeException compensationExcention) {
+				log.error("COMPENSATION TRANSACTION ERROR! {}",
+							compensationExcention);
+			}
+			throw new RuntimeException("Failed to create a course",
+						originalException);
 		}
 
 	}
-	
+
 //	@Transactional
 //	public void createCourseOptimisticLocking3(Course course) {
 //		//0. 입력값 Validation
@@ -263,7 +311,7 @@ public class CourseService {
 //			
 //		} catch (Exception originalException) {
 //			try {
-//				memberGateway.romoveManager(courseId, loginUser);
+//				memberGateway.removeManager(courseId, loginUser);
 //			} catch  (Exception compensationExcention) {
 //				log.error("COMPENSATION TRANSACTION ERROR! {}", compensationExcention);
 //			}
@@ -271,7 +319,7 @@ public class CourseService {
 //		}
 //	}
 //	
-	
+
 	private void ensureUserCanCreateCourse(UserDetails loginUser) {
 	}
 
@@ -280,7 +328,7 @@ public class CourseService {
 
 	public Course get(String id) {
 		return courseMapper.select(id);
-		
+
 	}
 
 }

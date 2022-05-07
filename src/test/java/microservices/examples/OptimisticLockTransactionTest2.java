@@ -100,7 +100,7 @@ class OptimisticLockTransactionTest2 {
 		try {
 			service.createCourseOptimisticLocking_oneTryCatchBlock(course);
 		} catch (Exception e) {
-			verify(memberGateway).romoveManager(any(), any());
+			verify(memberGateway).removeManager(any(), any());
 			assertEquals("Failed to create a course", e.getMessage());
 			assertEquals("add board rest api failed!", e.getCause().getMessage());
 			assertNull(service.get(course.getId()));
@@ -112,7 +112,7 @@ class OptimisticLockTransactionTest2 {
 	@Test
 	void 게시판생성하다_에러로_관리자_생성_보상트랜잭션_중에_에러발생하면__적절히_로그남기고_나머지_롤백() {
 		when(boardGateway.addBoard(any(), any())).thenThrow(new RuntimeException("add board rest api failed!"));
-		doThrow(new RuntimeException("Compensation Tx Failed")).when(memberGateway).romoveManager(any(), any());
+		doThrow(new RuntimeException("Compensation Tx Failed")).when(memberGateway).removeManager(any(), any());
 		
 		Course course = aCourse();
 		try {
@@ -146,7 +146,7 @@ class OptimisticLockTransactionTest2 {
 		try {
 			service.createCourseOptimisticLocking_oneTryCatchBlock(course);
 		} catch (Exception e) {
-			verify(memberGateway).romoveManager(any(), any());
+			verify(memberGateway).removeManager(any(), any());
 			verify(boardGateway).removeBoard(any(), any());
 			assertEquals("Failed to create a course", e.getMessage());
 			assertEquals("Failed to commit!", e.getCause().getMessage());

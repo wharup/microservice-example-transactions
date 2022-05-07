@@ -64,7 +64,9 @@ class PessimisticLockTransactionTest {
 	@Test
 	void 정상적으로_생성() {
 		Course course = aCourse();
+		log.error("-_-;;0-1");
 		service.createCourse(course);
+		log.error("-_-;;0-2");
 		assertNotNull(service.get(course.getId()));
 	}
 
@@ -89,7 +91,7 @@ class PessimisticLockTransactionTest {
 		try {
 			service.createCourse(course);
 		} catch (Exception e) {
-			verify(memberGateway).romoveManager(any(), any());
+			verify(memberGateway).removeManager(any(), any());
 			assertEquals("add board rest api failed!", e.getMessage());
 			assertNull(service.get(course.getId()));
 			return;
@@ -100,7 +102,7 @@ class PessimisticLockTransactionTest {
 	@Test
 	void 게시판생성하다_에러로_관리자_생성_보상트랜잭션_중에_에러발생하면__적절히_로그남기고_나머지_롤백() {
 		when(boardGateway.addBoard(any(), any())).thenThrow(new RuntimeException("add board rest api failed!"));
-		doThrow(new RuntimeException("Compensation Tx Failed")).when(memberGateway).romoveManager(any(), any());
+		doThrow(new RuntimeException("Compensation Tx Failed")).when(memberGateway).removeManager(any(), any());
 		
 		Course course = aCourse();
 		try {
