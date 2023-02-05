@@ -1,14 +1,13 @@
 package microservices.examples;
 
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.Locale;
@@ -21,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionException;
@@ -42,7 +40,7 @@ import microservices.examples.tx.gateway.MemberGateway;
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
 @Slf4j
-class OptimisticLockTransactionTest2 {
+class OptimisticLockTransactionTest_3_shortTxSpan {
 
 	@Autowired
 	CourseMyBatisDAO courseMapper;
@@ -74,7 +72,9 @@ class OptimisticLockTransactionTest2 {
 	@Test
 	void 정상적으로_생성() {
 		Course course = aCourse();
-		service.createCourseOptimisticLocking_oneTryCatchBlock(course);
+		log.error("-_-;;00-1");
+		service.createCourseOptimisticLocking_shortTransactionSpan(course);
+		log.error("-_-;;00-2");
 		assertNotNull(service.get(course.getId()));
 	}
 
@@ -83,7 +83,7 @@ class OptimisticLockTransactionTest2 {
 		when(memberGateway.addManager(any(), any())).thenThrow(new RuntimeException("add member rest api failed!"));
 		Course course = aCourse();
 		try {
-			service.createCourseOptimisticLocking_oneTryCatchBlock(course);
+			service.createCourseOptimisticLocking_shortTransactionSpan(course);
 		}catch (Exception e) {
 			assertEquals("Failed to create a course", e.getMessage());
 			assertEquals("add member rest api failed!", e.getCause().getMessage());
@@ -98,7 +98,7 @@ class OptimisticLockTransactionTest2 {
 		when(boardGateway.addBoard(any(), any())).thenThrow(new RuntimeException("add board rest api failed!"));
 		Course course = aCourse();
 		try {
-			service.createCourseOptimisticLocking_oneTryCatchBlock(course);
+			service.createCourseOptimisticLocking_shortTransactionSpan(course);
 		} catch (Exception e) {
 			verify(memberGateway).removeManager(any(), any());
 			assertEquals("Failed to create a course", e.getMessage());
@@ -116,7 +116,7 @@ class OptimisticLockTransactionTest2 {
 		
 		Course course = aCourse();
 		try {
-			service.createCourseOptimisticLocking_oneTryCatchBlock(course);
+			service.createCourseOptimisticLocking_shortTransactionSpan(course);
 		} catch (Exception e) {
 			verify(memberGateway).addManager(any(), any());
 			assertEquals("Failed to create a course", e.getMessage());
@@ -144,10 +144,8 @@ class OptimisticLockTransactionTest2 {
 
 		Course course = aCourse();
 		try {
-			service.createCourseOptimisticLocking_oneTryCatchBlock(course);
+			service.createCourseOptimisticLocking_shortTransactionSpan(course);
 		} catch (Exception e) {
-			verify(memberGateway).removeManager(any(), any());
-			verify(boardGateway).removeBoard(any(), any());
 			assertEquals("Failed to create a course", e.getMessage());
 			assertEquals("Failed to commit!", e.getCause().getMessage());
 			assertNull(service.get(course.getId()));

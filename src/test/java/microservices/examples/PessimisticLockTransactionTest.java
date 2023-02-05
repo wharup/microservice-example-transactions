@@ -64,10 +64,9 @@ class PessimisticLockTransactionTest {
 	@Test
 	void 정상적으로_생성() {
 		Course course = aCourse();
-		log.error("-_-;;0-1");
 		service.createCourse(course);
-		log.error("-_-;;0-2");
-		assertNotNull(service.get(course.getId()));
+		Course actual = service.get(course.getId());
+		assertNotNull(actual);
 	}
 
 	@Test

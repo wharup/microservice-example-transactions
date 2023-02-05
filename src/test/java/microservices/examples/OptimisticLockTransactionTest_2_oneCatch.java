@@ -42,7 +42,7 @@ import microservices.examples.tx.gateway.MemberGateway;
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
 @Slf4j
-class OptimisticLockTransactionTest_shortTxSpan {
+class OptimisticLockTransactionTest_2_oneCatch {
 
 	@Autowired
 	CourseMyBatisDAO courseMapper;
@@ -74,9 +74,7 @@ class OptimisticLockTransactionTest_shortTxSpan {
 	@Test
 	void 정상적으로_생성() {
 		Course course = aCourse();
-		log.error("-_-;;00-1");
-		service.createCourseOptimisticLocking_shortTransactionSpan(course);
-		log.error("-_-;;00-2");
+		service.createCourseOptimisticLocking_oneTryCatchBlock(course);
 		assertNotNull(service.get(course.getId()));
 	}
 
@@ -85,9 +83,9 @@ class OptimisticLockTransactionTest_shortTxSpan {
 		when(memberGateway.addManager(any(), any())).thenThrow(new RuntimeException("add member rest api failed!"));
 		Course course = aCourse();
 		try {
-			service.createCourseOptimisticLocking_shortTransactionSpan(course);
+			service.createCourseOptimisticLocking_oneTryCatchBlock(course);
 		}catch (Exception e) {
-			assertEquals("Failed to create a course", e.getMessage());
+			assertEquals("Failed to create a course:[courseSaved]", e.getMessage());
 			assertEquals("add member rest api failed!", e.getCause().getMessage());
 			assertNull(service.get(course.getId()));
 			return;
@@ -100,10 +98,10 @@ class OptimisticLockTransactionTest_shortTxSpan {
 		when(boardGateway.addBoard(any(), any())).thenThrow(new RuntimeException("add board rest api failed!"));
 		Course course = aCourse();
 		try {
-			service.createCourseOptimisticLocking_shortTransactionSpan(course);
+			service.createCourseOptimisticLocking_oneTryCatchBlock(course);
 		} catch (Exception e) {
 			verify(memberGateway).removeManager(any(), any());
-			assertEquals("Failed to create a course", e.getMessage());
+			assertEquals("Failed to create a course:[managerAdded, courseSaved]", e.getMessage());
 			assertEquals("add board rest api failed!", e.getCause().getMessage());
 			assertNull(service.get(course.getId()));
 			return;
@@ -118,10 +116,10 @@ class OptimisticLockTransactionTest_shortTxSpan {
 		
 		Course course = aCourse();
 		try {
-			service.createCourseOptimisticLocking_shortTransactionSpan(course);
+			service.createCourseOptimisticLocking_oneTryCatchBlock(course);
 		} catch (Exception e) {
 			verify(memberGateway).addManager(any(), any());
-			assertEquals("Failed to create a course", e.getMessage());
+			assertEquals("Failed to create a course:[managerAdded, courseSaved]", e.getMessage());
 			assertEquals("add board rest api failed!", e.getCause().getMessage());
 			assertNull(service.get(course.getId()));
 			return;
@@ -146,9 +144,11 @@ class OptimisticLockTransactionTest_shortTxSpan {
 
 		Course course = aCourse();
 		try {
-			service.createCourseOptimisticLocking_shortTransactionSpan(course);
+			service.createCourseOptimisticLocking_oneTryCatchBlock(course);
 		} catch (Exception e) {
-			assertEquals("Failed to create a course", e.getMessage());
+			verify(memberGateway).removeManager(any(), any());
+			verify(boardGateway).removeBoard(any(), any());
+			assertEquals("Failed to create a course:[managerAdded, boardAdded, courseSaved]", e.getMessage());
 			assertEquals("Failed to commit!", e.getCause().getMessage());
 			assertNull(service.get(course.getId()));
 			return;

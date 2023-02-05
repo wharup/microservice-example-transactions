@@ -50,7 +50,6 @@ public class CourseService {
 
 	@Transactional
 	public void createCourse(Course course) {
-		log.error("-_-;;1-1");
 		// 0. 입력값 Validation
 		UserDetails loginUser = ExampleSecurityContext.getCurrentLoginUser();
 		ensureUserCanCreateCourse(loginUser);
@@ -58,9 +57,7 @@ public class CourseService {
 
 		// 1. 과정 정보 생성
 		String courseId = course.getId();
-		log.error("-_-;;1-2");
 		courseMapper.create(course);
-		log.error("-_-;;1-3");
 
 		// 2. 멤버 서비스에 생성자를 관리자로 등록 w/ courseId
 		memberGateway.addManager(courseId, loginUser);
@@ -78,7 +75,6 @@ public class CourseService {
 			}
 			throw originalException;
 		}
-		log.error("-_-;;1-10");
 	}
 
 public void createCourseOptimisticLocking_oneTryCatchBlock(Course course) {
@@ -124,7 +120,6 @@ public void createCourseOptimisticLocking_oneTryCatchBlock(Course course) {
 		String msg = "Failed to create a course:"+ txLog.toString();
 		throw new RuntimeException(msg,originalException);
 	}
-	log.error("-_-5;;");
 }
 
 	public void createCourseOptimisticLocking_shortTransactionSpan(Course course) {
@@ -133,24 +128,18 @@ public void createCourseOptimisticLocking_oneTryCatchBlock(Course course) {
 		ensureUserCanCreateCourse(loginUser);
 		validateNewCourse(course);
 
-		log.error("-_-;;01-1");
 		TransactionDefinition txDefinition = new DefaultTransactionDefinition();
-		log.error("-_-;;01-2");
 		TransactionStatus txStatus = transactionManager
 					.getTransaction(txDefinition);
-		log.error("-_-;;01-3");
 
 		Set<String> txLog = new HashSet<>();
 
 		// 1. 과정 정보 생
 		String courseId = null;
 		courseId = course.getId();
-		log.error("-_-;;01-4");
 		courseRepository.save(course);
-		log.error("-_-;;01-5");
 		try {
 			transactionManager.commit(txStatus);
-			log.error("-_-;;01-1");
 		} catch (Exception exception) {
 			transactionManager.rollback(txStatus);
 			throw new RuntimeException("Failed to create a course", exception);
@@ -287,38 +276,6 @@ public void createCourseOptimisticLocking_oneTryCatchBlock(Course course) {
 		}
 
 	}
-
-//	@Transactional
-//	public void createCourseOptimisticLocking3(Course course) {
-//		//0. 입력값 Validation
-//		UserDetails loginUser = ExampleSecurityContext.getCurrentLoginUser();
-//		ensureUserCanCreateCourse(loginUser);
-//		validateNewCourse(course);
-//		
-//		TransactionDefinition txDefinition = new DefaultTransactionDefinition();
-//		TransactionStatus txStatus = transactionManager.getTransaction(txDefinition);
-//		
-//		//1. 과정 정보 생
-//		String courseId = course.getId();
-//		courseRepository.save(course);
-//		
-//		//2. 멤버 서비스에 생성자를 관리자로 등록 w/ courseId
-//		memberGateway.addManager(courseId, loginUser);
-//		
-//		//3. 과정 게시판 서비스에 게시판 생성 w/ courseId
-//		try {
-//			boardGateway.addBoard(courseId, loginUser);
-//			
-//		} catch (Exception originalException) {
-//			try {
-//				memberGateway.removeManager(courseId, loginUser);
-//			} catch  (Exception compensationExcention) {
-//				log.error("COMPENSATION TRANSACTION ERROR! {}", compensationExcention);
-//			}
-//			throw originalException;
-//		}
-//	}
-//	
 
 	private void ensureUserCanCreateCourse(UserDetails loginUser) {
 	}

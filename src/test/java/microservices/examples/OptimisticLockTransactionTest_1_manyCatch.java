@@ -40,7 +40,7 @@ import microservices.examples.tx.gateway.MemberGateway;
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
 @Slf4j
-class OptimisticLockTransactionTest {
+class OptimisticLockTransactionTest_1_manyCatch {
 
 	@Autowired
 	CourseMyBatisDAO courseMapper;
